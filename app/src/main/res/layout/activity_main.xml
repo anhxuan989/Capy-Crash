@@ -7,20 +7,26 @@
         android:id="@+id/main_toolbar"
         layout="@layout/toolbar" />
 
-    <ViewStub
-        android:id="@+id/main_cab_stub"
+    <capturecrash.log.dev.ui.view.CenteredToolbar
+        android:id="@+id/main_cab_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?actionBarSize" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="6dp"
+        android:theme="?actionBarTheme"
+        android:visibility="gone" />
 
     <FrameLayout
+        android:id="@+id/main_content_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?actionBarSize">
 
-        <taco.scoop.ui.view.CrashRecyclerView
+        <capturecrash.log.dev.ui.view.CrashRecyclerView
             android:id="@+id/main_crash_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
             android:scrollbars="vertical" />
 
         <ProgressBar

@@ -7,11 +7,12 @@
         android:id="@+id/detail_toolbar"
         layout="@layout/toolbar" />
 
-    <taco.scoop.ui.view.CroppingScrollView
+    <capturecrash.log.dev.ui.view.CroppingScrollView
         android:id="@+id/detail_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
+        android:clipToPadding="false"
         android:scrollbars="horizontal|vertical">
 
         <TextView
@@ -21,13 +22,14 @@
             android:padding="@dimen/detail_text_padding"
             android:textColor="?android:textColorPrimary" />
 
-    </taco.scoop.ui.view.CroppingScrollView>
+    </capturecrash.log.dev.ui.view.CroppingScrollView>
 
     <EditText
         android:id="@+id/detail_crash_edit"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
+        android:clipToPadding="false"
         android:gravity="top"
         android:inputType="none"
         android:padding="@dimen/detail_text_padding"

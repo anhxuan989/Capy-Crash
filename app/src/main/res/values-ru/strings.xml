@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <!-- Toolbar titles -->
     <string name="settings_title">Настройки</string>
     <string name="blacklist_title">Черный список</string>
@@ -70,11 +70,11 @@
     <string name="settings_permission_status">Проверка выдачи разрешения</string>
     <string name="settings_permission_status_summary_true">Разрешение READ_LOGS выдано</string>
     <string name="settings_permission_status_summary_false">В разрешении READ_LOGS отказано</string>
-    <string name="settings_autostart_on_boot">Добавить Scoop в автозагрузку</string>
-    <string name="settings_autostart_on_boot_summary">Автоматически запускать Scoop вместе с другими системными процессами каждую загрузку устройства</string>
+    <string name="settings_autostart_on_boot">Добавить Capy Crash в автозагрузку</string>
+    <string name="settings_autostart_on_boot_summary">Автоматически запускать Capy Crash вместе с другими системными процессами каждую загрузку устройства</string>
     <string name="settings_ignore_threaddeath">Игнорировать ошибки ThreadDeath</string>
     <string name="settings_ignore_threaddeath_summary">Ошибка ThreadDeath возникает после принудительной остановки рабочего потока. Это \"нормальное явление\" не приводит к сбою приложений</string>
-    <string name="settings_about">О Scoop</string>
+    <string name="settings_about">О Capy Crash</string>
 
     <!-- About screen -->
     <string name="about_author">Разработано %1$s</string>
@@ -83,7 +83,7 @@
 
     <!-- Notification channels -->
     <string name="crash_channel">Сбои приложений</string>
-    <string name="status_channel">Статус работы Scoop</string>
+    <string name="status_channel">Статус работы Capy Crash</string>
     <string name="scoop_running">Мониторинг сбоев приложений</string>
     <string name="action_kill">Остановить</string>
 </resources>

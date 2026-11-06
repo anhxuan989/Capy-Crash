@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <!-- Toolbar titles -->
     <string name="settings_title">設定</string>
     <string name="blacklist_title">黑名單</string>
@@ -45,7 +45,7 @@
 
     <!-- Settings (notifications) -->
     <string name="settings_system_notifications">通知設定</string>
-    <string name="settings_system_notifications_summary">在系統設定中調整 Scoop 的通知</string>
+    <string name="settings_system_notifications_summary">在系統設定中調整 Capy Crash 的通知</string>
     <string name="settings_show_notif">應用崩潰時彈出通知</string>
     <string name="settings_action_buttons">顯示操作按鈕</string>
     <string name="settings_action_buttons_summary">顯示複製或分享崩潰訊息的按鈕</string>
@@ -71,10 +71,10 @@
     <string name="settings_permission_status_summary_true">獲取 READ_LOGS 權限成功</string>
     <string name="settings_permission_status_summary_false">獲取 READ_LOGS 權限失敗</string>
     <string name="settings_autostart_on_boot">開機自啟</string>
-    <string name="settings_autostart_on_boot_summary">開機時自動啟動 Scoop</string>
+    <string name="settings_autostart_on_boot_summary">開機時自動啟動 Capy Crash</string>
     <string name="settings_ignore_threaddeath">忽略 ThreadDeath 錯誤</string>
     <string name="settings_ignore_threaddeath_summary">拋出 ThreadDeath 錯誤可以強制停止某個執行緒，這個錯誤經常發生且不會導致整個應用崩潰</string>
-    <string name="settings_about">關於 Scoop</string>
+    <string name="settings_about">關於 Capy Crash</string>
 
     <!-- About screen -->
     <string name="about_author">由 %1$s 用愛驅動</string>
@@ -83,7 +83,7 @@
 
     <!-- Notification channels -->
     <string name="crash_channel">應用崩潰</string>
-    <string name="status_channel">Scoop 執行狀態</string>
+    <string name="status_channel">Capy Crash 執行狀態</string>
     <string name="scoop_running">正在監視崩潰狀態</string>
     <string name="action_kill">停止</string>
 </resources>

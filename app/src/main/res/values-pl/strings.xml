@@ -1,8 +1,8 @@
-<resources>
+﻿<resources>
     <!-- Toolbar titles -->
     <string name="settings_title">Ustawienia</string>
     <string name="blacklist_title">Czarna lista</string>
-    <string name="about_title">O Scoop</string>
+    <string name="about_title">O Capy Crash</string>
 
     <!-- Actions -->
     <string name="action_clear">Wyczyść</string>
@@ -70,11 +70,11 @@
     <string name="settings_permission_status">Status uprawnień</string>
     <string name="settings_permission_status_summary_true">Uprawnienie READ_LOGS jest przyznane</string>
     <string name="settings_permission_status_summary_false">Uprawnienie READ_LOGS jest nieprzyznane</string>
-    <string name="settings_autostart_on_boot">Uruchamiaj Scoop przy starcie systemu</string>
-    <string name="settings_autostart_on_boot_summary">Automatycznie uruchamiania program Scoop przy starcie urządzenia wraz z innymi procesami systemowymi</string>
+    <string name="settings_autostart_on_boot">Uruchamiaj Capy Crash przy starcie systemu</string>
+    <string name="settings_autostart_on_boot_summary">Automatycznie uruchamiania program Capy Crash przy starcie urządzenia wraz z innymi procesami systemowymi</string>
     <string name="settings_ignore_threaddeath">Ignoruj błędy ThreadDeath</string>
     <string name="settings_ignore_threaddeath_summary">Błąd ThreadDeath pojawia się w celu wymuszenia zatrzymania wątku aplikacji. Jest to \"normalne wystąpienie błędu\" i nie powoduje awarii aplikacji</string>
-    <string name="settings_about">O Scoop</string>
+    <string name="settings_about">O Capy Crash</string>
 
     <!-- About screen -->
     <string name="about_author">Opracowywane przez %1$s</string>
@@ -83,7 +83,7 @@
 
     <!-- Notification channels -->
     <string name="crash_channel">Crashe aplikacji</string>
-    <string name="status_channel">Scoop status</string>
+    <string name="status_channel">Capy Crash status</string>
     <string name="scoop_running">Monitoruje crashe aplikacji</string>
     <string name="action_kill">Stop</string>
 </resources>

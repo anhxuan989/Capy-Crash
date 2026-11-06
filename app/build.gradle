@@ -4,22 +4,22 @@ plugins {
 }
 
 android {
-    compileSdk 32
-    buildToolsVersion = "34.0.0"
-    namespace "taco.scoop"
+    compileSdk 36
+    buildToolsVersion = "36.1.0"
+    namespace "capturecrash.log.dev"
 
     defaultConfig {
-        applicationId "taco.scoop"
-        minSdk 21
-        targetSdk 32
-        versionCode 34
-        versionName "2.4.2"
+        applicationId "capturecrash.log.dev"
+        minSdk 24
+        targetSdk 36
+        versionCode 35
+        versionName "3.0.0"
     }
 
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -30,7 +30,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = "17"
         freeCompilerArgs = ["-opt-in=kotlin.RequiresOptIn"]
     }
 
@@ -39,9 +39,9 @@ android {
         abortOnError false
     }
 
-    packagingOptions {
+    packaging {
         resources {
-            excludes.add('META-INF/*')
+            excludes += ['META-INF/*']
         }
     }
 
@@ -53,25 +53,25 @@ android {
 }
 
 dependencies {
-// Xposed
-    // NOTE: JCENTER IS DEPRECATED! Waiting on https://github.com/rovo89/XposedBridge/issues/288
-    compileOnly 'de.robv.android.xposed:api:82'
-    compileOnly 'de.robv.android.xposed:api:82:sources'
+    // Xposed
+    compileOnly files('libs/xposed-api-82.jar')
+    compileOnly files('libs/xposed-api-82-sources.jar')
 
-// Kotlin
+    // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-// AndroidX
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    // AndroidX
+    implementation 'androidx.activity:activity-ktx:1.9.3'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.fragment:fragment-ktx:1.5.2'
-    implementation 'androidx.preference:preference-ktx:1.2.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.fragment:fragment-ktx:1.8.5'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'com.google.android.material:material:1.12.0'
 
-// Other
-    // TODO: Replace Inquiry with AndroidX Room
-    implementation 'com.afollestad:inquiry:5.0.0'
-    implementation 'com.afollestad:material-cab:2.0.1'
-    implementation 'com.github.topjohnwu.libsu:core:5.2.1'
+    // Root & Shizuku
+    implementation 'com.github.topjohnwu.libsu:core:6.0.0'
+    implementation 'dev.rikka.shizuku:api:13.1.5'
+    implementation 'dev.rikka.shizuku:provider:13.1.5'
 }

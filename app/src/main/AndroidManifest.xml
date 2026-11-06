@@ -4,7 +4,9 @@
     android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission
         android:name="android.permission.READ_LOGS"
@@ -18,8 +20,11 @@
         android:name=".ScoopApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:enableOnBackInvokedCallback="true"
+        android:resizeableActivity="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:targetApi="36">
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
@@ -30,12 +35,23 @@
             android:name="xposedminversion"
             android:value="82" />
         <meta-data
+            android:name="xposedscope"
+            android:resource="@array/xposed_scope" />
+        <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:enabled="true"
+            android:exported="true"
+            android:multiprocess="false"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
         <activity
             android:name=".ui.activity.MainActivity"
-            android:configChanges="orientation|screenSize|screenLayout"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -80,30 +96,42 @@
             android:exported="true"
             tools:ignore="ExportedReceiver">
             <intent-filter>
-                <action android:name="taco.scoop.EXCEPTION" />
+                <action android:name="capturecrash.log.dev.EXCEPTION" />
             </intent-filter>
         </receiver>
         <receiver
             android:name=".core.receiver.NotificationActionReceiver"
-            android:exported="true"
-            tools:ignore="ExportedReceiver">
+            android:exported="false">
             <intent-filter>
-                <action android:name="taco.scoop.ACTION_COPY" />
+                <action android:name="capturecrash.log.dev.ACTION_COPY" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".core.service.indicator.IndicatorService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Continuous monitoring of application crash stack traces for debugging" />
+        </service>
 
         <receiver
             android:name=".core.receiver.StopReceiver"
-            android:enabled="true" />
+            android:enabled="true"
+            android:exported="false" />
 
         <service
             android:name=".core.service.detector.CrashDetectorService"
             android:enabled="true"
-            android:process=":crashDetectorService" />
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":crashDetectorService">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Continuous monitoring of logcat crash stack traces for debugging" />
+        </service>
     </application>
 
 </manifest>

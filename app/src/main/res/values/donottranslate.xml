@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name" translatable="false">Scoop</string>
+    <string name="app_name" translatable="false">Capy Crash</string>
     <string name="app_description" translatable="false">Catches a stack trace when an app crashes unexpectedly.</string>
 
     <string name="no_permission_1" translatable="false">Y U NO</string>
-    <string name="no_permission_2" translatable="false">GRANT ADB PERMISSION OR ROOT ACCESS</string>
+    <string name="no_permission_2" translatable="false">GRANT ADB / SHIZUKU PERMISSION OR ROOT ACCESS</string>
 
     <string name="settings_force_eng" translatable="false">Force English app language</string>
 </resources>

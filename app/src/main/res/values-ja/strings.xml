@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <!-- Toolbar titles -->
     <string name="settings_title">設定</string>
     <string name="blacklist_title">ブラックリスト</string>
@@ -70,11 +70,11 @@
     <string name="settings_permission_status">権限の状態</string>
     <string name="settings_permission_status_summary_true">権限 READ_LOGS は許可されました</string>
     <string name="settings_permission_status_summary_false">権限 READ_LOGS は拒否されました</string>
-    <string name="settings_autostart_on_boot">端末の起動時にScoopを自動的に起動させる</string>
-    <string name="settings_autostart_on_boot_summary">端末の起動時に他のシステムプロセスと一緒にScoopを自動的に起動させる</string>
+    <string name="settings_autostart_on_boot">端末の起動時にCapy Crashを自動的に起動させる</string>
+    <string name="settings_autostart_on_boot_summary">端末の起動時に他のシステムプロセスと一緒にCapy Crashを自動的に起動させる</string>
     <string name="settings_ignore_threaddeath">ThreadDeathエラーを無視</string>
     <string name="settings_ignore_threaddeath_summary">ワーカースレッドを強制的に停止させるためにThreadDeathエラーが発生します。これは 通常の挙動であり、アプリがクラッシュすることはありません。</string>
-    <string name="settings_about">Scoopについて</string>
+    <string name="settings_about">Capy Crashについて</string>
 
     <!-- About screen -->
     <string name="about_author">%1$s によって開発されました</string>
@@ -83,7 +83,7 @@
 
     <!-- Notification channels -->
     <string name="crash_channel">アプリケーションのクラッシュ</string>
-    <string name="status_channel">Scoopのステータス</string>
+    <string name="status_channel">Capy Crashのステータス</string>
     <string name="scoop_running">アプリのクラッシュを監視中</string>
     <string name="action_kill">停止</string>
 </resources>

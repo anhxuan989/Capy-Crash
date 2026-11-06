@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <!-- Toolbar titles -->
     <string name="settings_title">การตั้งค่า</string>
     <string name="blacklist_title">รายการยกเว้น</string>
@@ -70,11 +70,11 @@
     <string name="settings_permission_status">สถานะสิทธิ์การเข้าถึง</string>
     <string name="settings_permission_status_summary_true">สิทธิ์การเข้าถึง LOG ได้รับอนุญาติ</string>
     <string name="settings_permission_status_summary_false">สิทธิ์การเข้าถึง LOG ถูกปฏิเสธ</string>
-    <string name="settings_autostart_on_boot">เริ่ม Scoop เมื่อเปิดเครื่อง</string>
-    <string name="settings_autostart_on_boot_summary">เริ่มการทำงาน Scoop โดนอัตโนมัติเมื่อเปิดเครื่อง</string>
+    <string name="settings_autostart_on_boot">เริ่ม Capy Crash เมื่อเปิดเครื่อง</string>
+    <string name="settings_autostart_on_boot_summary">เริ่มการทำงาน Capy Crash โดนอัตโนมัติเมื่อเปิดเครื่อง</string>
     <string name="settings_ignore_threaddeath">ไม่สนข้อผิดพลาดที่เกิดจาก ThreadDeath</string>
     <string name="settings_ignore_threaddeath_summary">ThreadDeath เป็นข้อผิดพลาดที่เกิดจากการบังคับหยุดการทำงานของ worker thread ซึ่งเป็นเหตุการณ์ปกติไม่ได้ทำให้แอปเด้ง</string>
-    <string name="settings_about">เกี่ยวกับ Scoop</string>
+    <string name="settings_about">เกี่ยวกับ Capy Crash</string>
 
     <!-- About screen -->
     <string name="about_author">พัฒนาโดย %1$s</string>
@@ -83,7 +83,7 @@
 
     <!-- Notification channels -->
     <string name="crash_channel">ข้อผิดพลาดจากแอป</string>
-    <string name="status_channel">สถานะ Scoop</string>
+    <string name="status_channel">สถานะ Capy Crash</string>
     <string name="scoop_running">กำลังตรวจหาข้อผิดพลาด</string>
     <string name="action_kill">หยุด</string>
 </resources>

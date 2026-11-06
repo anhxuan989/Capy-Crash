@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default LSPosed / Xposed scope:
+         - "android" (System Framework / ActivityManagerService) catches crashes of ALL apps globally!
+         - "capturecrash.log.dev" allows Capy Crash to detect that its Xposed module is active. -->
+    <string-array name="xposed_scope" translatable="false">
+        <item>android</item>
+        <item>capturecrash.log.dev</item>
+    </string-array>
+</resources>

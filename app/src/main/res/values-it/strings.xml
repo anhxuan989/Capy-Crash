@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <!-- Toolbar titles -->
     <string name="settings_title">Impostazioni</string>
     <string name="blacklist_title">Lista nera</string>
@@ -70,11 +70,11 @@
     <string name="settings_permission_status">Concessione del permesso</string>
     <string name="settings_permission_status_summary_true">Permesso READ_LOGS concesso</string>
     <string name="settings_permission_status_summary_false">Permesso READ_LOGS negato</string>
-    <string name="settings_autostart_on_boot">Esegui Scoop all\'avvio</string>
-    <string name="settings_autostart_on_boot_summary">Avvia automaticamente Scoop all\'avvio del dispositivo insieme agli altri processi del sistema</string>
+    <string name="settings_autostart_on_boot">Esegui Capy Crash all\'avvio</string>
+    <string name="settings_autostart_on_boot_summary">Avvia automaticamente Capy Crash all\'avvio del dispositivo insieme agli altri processi del sistema</string>
     <string name="settings_ignore_threaddeath">Ignora Errori di Arresto Forzato</string>
     <string name="settings_ignore_threaddeath_summary">L\'errore \'ThreadDeath\' viene generato per forzare l\'arresto di un processo in esecuzione. Questo rappresenta una \"normale occorrenza\" e non fa collassare una applicazione</string>
-    <string name="settings_about">Info su Scoop</string>
+    <string name="settings_about">Info su Capy Crash</string>
 
     <!-- About screen -->
     <string name="about_author">Sviluppato da %1$s</string>
@@ -83,7 +83,7 @@
 
     <!-- Notification channels -->
     <string name="crash_channel">Segnalazioni App</string>
-    <string name="status_channel">Stato di Scoop</string>
+    <string name="status_channel">Stato di Capy Crash</string>
     <string name="scoop_running">Monitoraggio segnalazioni</string>
     <string name="action_kill">Stop</string>
 </resources>
