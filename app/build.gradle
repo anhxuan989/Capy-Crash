@@ -50,6 +50,13 @@ android {
         buildConfig = true
         aidl = true
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            def appName = "Capy Crash"
+            outputFileName = "${appName}_${variant.versionName}.apk"
+        }
+    }
 }
 
 dependencies {

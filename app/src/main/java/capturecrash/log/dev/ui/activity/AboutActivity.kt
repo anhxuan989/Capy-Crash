@@ -26,10 +26,7 @@ class AboutActivity : AppCompatActivity() {
             contentView = binding.aboutContent
         )
 
-        binding.aboutCredits.text = getString(
-            R.string.about_author,
-            "@MrWasdennnoch (XDA), @paphonb (XDA), @TacoTheDank (GitHub)"
-        )
+        binding.aboutCredits.text = getString(R.string.about_author)
 
         try {
             val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -49,7 +46,7 @@ class AboutActivity : AppCompatActivity() {
         binding.aboutGithub.setOnClickListener {
             val i = Intent(
                 Intent.ACTION_VIEW,
-                "https://github.com/TacoTheDank/Scoop".toUri()
+                "https://github.com/anhxuan989/Capy-Crash".toUri()
             )
             startActivity(i)
         }
