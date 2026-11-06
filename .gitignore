@@ -8,3 +8,17 @@ captures/
 .externalNativeBuild
 app/release
 app/debug
+
+# AI & Markdown files (excluding README.md)
+.agent/
+.agents/
+.gemini/
+.claude/
+.cursor/
+.windsurf/
+.github/copilot*
+AGENTS.md
+GEMINI.md
+CLAUDE.md
+*.md
+!README.md
