@@ -24,6 +24,7 @@ import capturecrash.log.dev.ui.activity.MainActivity
 import capturecrash.log.dev.util.Intents
 import capturecrash.log.dev.util.PreferenceHelper.blacklistList
 import capturecrash.log.dev.util.PreferenceHelper.ignoreThreadDeath
+import capturecrash.log.dev.util.PreferenceHelper.mutedList
 import capturecrash.log.dev.util.PreferenceHelper.showActionButtons
 import capturecrash.log.dev.util.PreferenceHelper.showNotifications
 import capturecrash.log.dev.util.PreferenceHelper.showStackTraceNotifications
@@ -63,7 +64,7 @@ class CrashReceiver : BroadcastReceiver() {
             crash = IntentCompat.getParcelableExtra(intent, "crash", Crash::class.java)
         }
 
-        if (!showNotifications) {
+        if (!showNotifications || mutedList.contains(packageName)) {
             return
         }
 
@@ -76,8 +77,13 @@ class CrashReceiver : BroadcastReceiver() {
             return
         }
 
-        val clickIntent = Intent(context, DetailActivity::class.java)
-            .putExtra(DetailActivity.EXTRA_CRASH, crash)
+        val clickIntent = Intent(context, DetailActivity::class.java).apply {
+            if (crash != null && crash.id > 0L) {
+                putExtra(DetailActivity.EXTRA_CRASH_ID, crash.id)
+            } else {
+                putExtra(DetailActivity.EXTRA_CRASH, crash)
+            }
+        }
         val stackBuilder = TaskStackBuilder.create(context)
             .addParentStack(DetailActivity::class.java)
             .addNextIntent(clickIntent)
@@ -101,7 +107,7 @@ class CrashReceiver : BroadcastReceiver() {
 
         val notificationId = (time - bootTime).toInt()
         if (showActionButtons) {
-            builder.addActionButtons(context, notificationId)
+            builder.addActionButtons(context, notificationId, crash?.id ?: -1L)
         }
 
         val manager = NotificationManagerCompat.from(context)
@@ -131,10 +137,10 @@ class CrashReceiver : BroadcastReceiver() {
     }
 
     private fun NotificationCompat.Builder.addActionButtons(
-        context: Context, notificationId: Int
+        context: Context, notificationId: Int, crashId: Long
     ): NotificationCompat.Builder {
         val copyIntent = Intent(context, NotificationActionReceiver::class.java)
-            .putExtra("stackTrace", stackTrace)
+            .putExtra("crash_id", crashId)
             .putExtra("pkg", packageName)
             .setAction(Intents.INTENT_ACTION_COPY)
         val copyPendingIntent = PendingIntent.getBroadcast(
@@ -148,11 +154,15 @@ class CrashReceiver : BroadcastReceiver() {
             )
         )
 
+        val safeTrace = if ((stackTrace?.length ?: 0) > 65536) {
+            stackTrace!!.substring(0, 65536) + "\n\n... [Truncated]"
+        } else {
+            stackTrace
+        }
         val shareIntent = Intent(Intent.ACTION_SEND)
-            .putExtra("stackTrace", stackTrace)
             .putExtra("pkg", packageName)
             .setType("text/plain")
-            .putExtra(Intent.EXTRA_TEXT, stackTrace)
+            .putExtra(Intent.EXTRA_TEXT, safeTrace)
         val shareChooserIntent = Intent.createChooser(shareIntent, null)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val sharePendingIntent = PendingIntent.getActivity(

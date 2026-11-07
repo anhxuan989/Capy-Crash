@@ -3,12 +3,14 @@
 
     <!-- Keys -->
     <string name="key_blacklisted_packages">blacklisted_packages</string>
+    <string name="key_muted_packages">muted_packages</string>
 
     <!-- Preference keys -->
     <string name="prefKey_notif_sys_settings">pref_notif_sys_settings</string>
     <string name="prefKey_show_notification">show_notification</string>
     <string name="prefKey_show_action_buttons">show_action_buttons</string>
     <string name="prefKey_show_stack_trace_notif">show_stack_trace_notif</string>
+    <string name="prefKey_muted_apps">pref_muted_apps</string>
 
     <string name="prefKey_combine_same_apps">combine_same_apps</string>
     <string name="prefKey_combine_same_stack_trace">combine_same_stack_trace</string>

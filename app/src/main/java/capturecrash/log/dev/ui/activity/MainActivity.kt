@@ -10,6 +10,7 @@ import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
@@ -129,16 +130,23 @@ class MainActivity : AppCompatActivity(), CrashAdapter.Listener, SearchView.OnQu
         ToolbarElevationHelper(binding.mainCrashView, binding.mainToolbar.toolbar)
 
         val i = intent
-        mHasCrash = i.hasExtra(EXTRA_CRASH)
+        mHasCrash = i.hasExtra(EXTRA_CRASH) || i.getBooleanExtra(EXTRA_HAS_CRASH, false)
         if (mHasCrash) {
-            val c: Crash? = IntentCompat.getParcelableExtra(i, EXTRA_CRASH, Crash::class.java)
-            val crashes = ArrayList<Crash?>()
-            crashes.add(c)
-            c?.children?.let(crashes::addAll)
-            mAdapter!!.setCrashes(crashes)
-            supportActionBar?.title =
-                CrashLoader.getAppName(this, c?.packageName, true)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            val c: Crash? = sPendingGroupCrash?.also { sPendingGroupCrash = null }
+                ?: try {
+                    IntentCompat.getParcelableExtra(i, EXTRA_CRASH, Crash::class.java)
+                } catch (_: Throwable) {
+                    null
+                }
+            if (c != null) {
+                val crashes = ArrayList<Crash?>()
+                crashes.add(c)
+                c.children?.let(crashes::addAll)
+                mAdapter!!.setCrashes(crashes)
+                supportActionBar?.title =
+                    CrashLoader.getAppName(this, c.packageName, true)
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
         }
 
         mCombineApps = PreferenceHelper.combineSameApps
@@ -185,8 +193,9 @@ class MainActivity : AppCompatActivity(), CrashAdapter.Listener, SearchView.OnQu
             }
             inflateMenu(R.menu.menu_cab)
             setOnMenuItemClickListener { item ->
-                if (item.itemId == R.id.menu_cab_delete) {
-                    showDeletePrompt()
+                when (item.itemId) {
+                    R.id.menu_cab_mute_notif -> toggleMuteSelectedApps()
+                    R.id.menu_cab_delete -> showDeletePrompt()
                 }
                 true
             }
@@ -278,21 +287,30 @@ class MainActivity : AppCompatActivity(), CrashAdapter.Listener, SearchView.OnQu
 
     private val activityResultLauncher = registerForActivityResult(StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
-            loadData()
+            if (mHasCrash) {
+                setResult(RESULT_OK)
+                finish()
+            } else {
+                loadData()
+            }
         }
     }
 
     override fun onCrashClicked(crash: Crash) {
         if (mCombineApps && !mHasCrash) {
+            sPendingGroupCrash = crash
             activityResultLauncher.launch(
                 Intent(this, MainActivity::class.java)
-                    .putExtra(EXTRA_CRASH, crash)
+                    .putExtra(EXTRA_HAS_CRASH, true)
             )
         } else {
-            startActivity(
-                Intent(this, DetailActivity::class.java)
-                    .putExtra(DetailActivity.EXTRA_CRASH, crash)
-            )
+            val intent = Intent(this, DetailActivity::class.java)
+            if (crash.id > 0L) {
+                intent.putExtra(DetailActivity.EXTRA_CRASH_ID, crash.id)
+            } else {
+                intent.putExtra(DetailActivity.EXTRA_CRASH, crash)
+            }
+            activityResultLauncher.launch(intent)
         }
     }
 
@@ -308,6 +326,58 @@ class MainActivity : AppCompatActivity(), CrashAdapter.Listener, SearchView.OnQu
                 ), count
             )
         )
+        updateCabMuteMenuIcon()
+    }
+
+    private fun updateCabMuteMenuIcon() {
+        val selectedPkgs = mAdapter?.selectedItems
+            ?.mapNotNull { it.packageName }
+            ?.filter { it.isNotEmpty() }
+            ?.distinct()
+            ?: emptyList()
+        val muteItem = binding.mainCabToolbar.menu.findItem(R.id.menu_cab_mute_notif) ?: return
+        if (selectedPkgs.isEmpty()) {
+            muteItem.isVisible = false
+            return
+        }
+        muteItem.isVisible = true
+        val allMuted = selectedPkgs.all { PreferenceHelper.isAppMuted(it) }
+        muteItem.setIcon(if (allMuted) R.drawable.ic_notifications else R.drawable.ic_notifications_off)
+        muteItem.setTitle(if (allMuted) R.string.action_unmute_notif else R.string.action_mute_notif)
+    }
+
+    private fun toggleMuteSelectedApps() {
+        val selectedPkgs = mAdapter?.selectedItems
+            ?.mapNotNull { it.packageName }
+            ?.filter { it.isNotEmpty() }
+            ?.distinct()
+            ?: return
+        if (selectedPkgs.isEmpty()) return
+
+        val currentMuted = PreferenceHelper.mutedList.toMutableList()
+        val allMuted = selectedPkgs.all { currentMuted.contains(it) }
+        if (allMuted) {
+            currentMuted.removeAll(selectedPkgs.toSet())
+        } else {
+            for (pkg in selectedPkgs) {
+                if (!currentMuted.contains(pkg)) {
+                    currentMuted.add(pkg)
+                }
+            }
+        }
+        PreferenceHelper.editMutedPackages(currentMuted)
+
+        val message = if (selectedPkgs.size == 1) {
+            val appName = CrashLoader.getAppName(this, selectedPkgs[0], false)
+            val resId = if (allMuted) R.string.notif_unmuted_toast else R.string.notif_muted_toast
+            getString(resId, appName)
+        } else {
+            val pluralRes = if (allMuted) R.plurals.notif_unmuted_multiple_toast else R.plurals.notif_muted_multiple_toast
+            resources.getQuantityString(pluralRes, selectedPkgs.size, selectedPkgs.size)
+        }
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        mAdapter?.setSelectionEnabled(false)
+        mAdapter?.notifyDataSetChanged()
     }
 
     private fun showDeletePrompt() {
@@ -412,10 +482,13 @@ class MainActivity : AppCompatActivity(), CrashAdapter.Listener, SearchView.OnQu
 
     companion object {
         private const val EXTRA_CRASH = "capturecrash.log.dev.EXTRA_CRASH"
+        private const val EXTRA_HAS_CRASH = "capturecrash.log.dev.EXTRA_HAS_CRASH"
         private const val UPDATE_DELAY = 200
         private var sUpdateRequired = false
         private var sVisible = false
         private var sNewCrash: Crash? = null
+        @Volatile
+        private var sPendingGroupCrash: Crash? = null
 
         fun requestUpdate(newCrash: Crash?) {
             sUpdateRequired = true

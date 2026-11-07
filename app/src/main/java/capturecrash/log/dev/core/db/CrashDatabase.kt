@@ -111,6 +111,30 @@ fun insertValues(values: List<Crash?>) {
     }
 }
 
+fun selectById(id: Long): Crash? {
+    if (id <= 0L) return null
+    val helper = getHelper("main")
+    val db = helper.readableDatabase
+    helper.createTableIfNeeded(db)
+    db.query(TABLE_NAME, null, "_id = ?", arrayOf(id.toString()), null, null, null).use { cursor ->
+        if (cursor.moveToFirst()) {
+            val idIdx = cursor.getColumnIndex("_id")
+            val timeIdx = cursor.getColumnIndex("time")
+            val pkgIdx = cursor.getColumnIndex("packageName")
+            val descIdx = cursor.getColumnIndex("description")
+            val traceIdx = cursor.getColumnIndex("stackTrace")
+            return Crash().apply {
+                this.id = if (idIdx != -1) cursor.getLong(idIdx) else 0L
+                this.time = if (timeIdx != -1) cursor.getLong(timeIdx) else 0L
+                this.packageName = if (pkgIdx != -1) cursor.getString(pkgIdx) else ""
+                this.description = if (descIdx != -1) cursor.getString(descIdx) else ""
+                this.stackTrace = if (traceIdx != -1) cursor.getString(traceIdx) else ""
+            }
+        }
+    }
+    return null
+}
+
 fun selectAll(): Array<out Crash>? {
     val helper = getHelper("main")
     val db = helper.readableDatabase

@@ -7,35 +7,41 @@
         android:id="@+id/detail_toolbar"
         layout="@layout/toolbar" />
 
-    <capturecrash.log.dev.ui.view.CroppingScrollView
-        android:id="@+id/detail_scroll_view"
+    <FrameLayout
+        android:id="@+id/detail_content_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:clipToPadding="false"
-        android:scrollbars="horizontal|vertical">
+        android:layout_marginTop="?attr/actionBarSize">
 
-        <TextView
-            android:id="@+id/detail_crashLog_text"
+        <capturecrash.log.dev.ui.view.CroppingScrollView
+            android:id="@+id/detail_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal|vertical">
+
+            <TextView
+                android:id="@+id/detail_crashLog_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/detail_text_padding"
+                android:textColor="?android:textColorPrimary" />
+
+        </capturecrash.log.dev.ui.view.CroppingScrollView>
+
+        <EditText
+            android:id="@+id/detail_crash_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:gravity="top"
+            android:inputType="none"
             android:padding="@dimen/detail_text_padding"
-            android:textColor="?android:textColorPrimary" />
+            android:scrollbars="vertical"
+            android:textColor="?android:textColorPrimary"
+            android:textIsSelectable="true"
+            android:visibility="gone" />
 
-    </capturecrash.log.dev.ui.view.CroppingScrollView>
-
-    <EditText
-        android:id="@+id/detail_crash_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?attr/actionBarSize"
-        android:clipToPadding="false"
-        android:gravity="top"
-        android:inputType="none"
-        android:padding="@dimen/detail_text_padding"
-        android:scrollbars="vertical"
-        android:textColor="?android:textColorPrimary"
-        android:textIsSelectable="true"
-        android:visibility="gone" />
+    </FrameLayout>
 
 </FrameLayout>

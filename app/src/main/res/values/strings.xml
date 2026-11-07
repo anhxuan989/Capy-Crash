@@ -2,6 +2,7 @@
     <!-- Toolbar titles -->
     <string name="settings_title">Settings</string>
     <string name="blacklist_title">Blacklist</string>
+    <string name="muted_apps_title">Muted apps</string>
     <string name="about_title">About</string>
 
     <!-- Actions -->
@@ -13,6 +14,11 @@
     <string name="action_copy">Copy to clipboard</string>
     <string name="action_copy_short">Copy</string>
     <string name="action_delete">Delete</string>
+    <string name="action_mute_notif">Mute app notifications</string>
+    <string name="action_unmute_notif">Unmute app notifications</string>
+    <string name="action_toggle_notif">Toggle app notifications</string>
+    <string name="action_blacklist_app">Blacklist app</string>
+    <string name="action_unblacklist_app">Remove from blacklist</string>
 
     <!-- Main activity stuff -->
     <string name="just_now">Just Now</string>
@@ -20,6 +26,18 @@
     <string name="app_not_installed">%s (not installed)</string>
     <string name="copy_label">Stack trace of %s</string>
     <string name="copied_toast">Stack trace copied to clipboard</string>
+    <string name="notif_muted_toast">Notifications muted for %s</string>
+    <string name="notif_unmuted_toast">Notifications unmuted for %s</string>
+    <string name="app_blacklisted_toast">%s added to blacklist</string>
+    <string name="app_unblacklisted_toast">%s removed from blacklist</string>
+    <plurals name="notif_muted_multiple_toast">
+        <item quantity="one">Notifications muted for %d app</item>
+        <item quantity="other">Notifications muted for %d apps</item>
+    </plurals>
+    <plurals name="notif_unmuted_multiple_toast">
+        <item quantity="one">Notifications unmuted for %d app</item>
+        <item quantity="other">Notifications unmuted for %d apps</item>
+    </plurals>
     <plurals name="items_selected_count">
         <item quantity="one">%d crash selected</item>
         <item quantity="other">%d crashes selected</item>
@@ -51,6 +69,8 @@
     <string name="settings_action_buttons_summary">Add buttons to copy and share the crash to the notification</string>
     <string name="settings_show_stack_trace">Show stack trace in notification</string>
     <string name="settings_show_stack_trace_summary">Display the beginning of the stack trace in the notification instead of just the description</string>
+    <string name="settings_muted_apps">Muted apps</string>
+    <string name="settings_muted_apps_summary">Do not show crash notifications for selected apps (logs are still saved)</string>
 
     <!-- Settings (overview) -->
     <string name="settings_combine_same_apps">Combine same apps</string>

@@ -12,8 +12,8 @@ android {
         applicationId "capturecrash.log.dev"
         minSdk 24
         targetSdk 36
-        versionCode 40
-        versionName "4.0.0"
+        versionCode 41
+        versionName "4.0.1"
     }
 
     buildTypes {

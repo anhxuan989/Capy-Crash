@@ -29,7 +29,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setupEdgeToEdge(
             toolbarView = binding.settingsToolbar.toolbar,
-            scrollingView = binding.settingsContainer
+            contentView = binding.settingsContainer
         )
 
         supportFragmentManager.commit {
@@ -54,6 +54,10 @@ class SettingsActivity : AppCompatActivity() {
                 requireContext().openSystemNotificationSettings()
                 true
             }
+
+            val mutedAppsPref = findPreference(R.string.prefKey_muted_apps)
+            mutedAppsPref?.intent = Intent(activity, BlacklistAppsActivity::class.java)
+                .putExtra(BlacklistAppsActivity.EXTRA_MUTE_MODE, true)
 
             val blacklistedAppsPref = findPreference(R.string.prefKey_blacklisted_apps)
             blacklistedAppsPref?.setActivityIntent(BlacklistAppsActivity::class.java)

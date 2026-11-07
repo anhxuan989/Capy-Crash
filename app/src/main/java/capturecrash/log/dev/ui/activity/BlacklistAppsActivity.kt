@@ -22,15 +22,21 @@ class BlacklistAppsActivity : AppCompatActivity(), SearchView.OnQueryTextListene
 
     private var mAdapter: AppAdapter? = null
     private var mIsLoading = false
+    private var mIsMuteMode = false
     private lateinit var binding: ActivityBlacklistAppsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        mIsMuteMode = intent.getBooleanExtra(EXTRA_MUTE_MODE, false)
+
         binding = ActivityBlacklistAppsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.blacklistToolbar.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        if (mIsMuteMode) {
+            supportActionBar?.setTitle(R.string.muted_apps_title)
+        }
 
         setupEdgeToEdge(
             toolbarView = binding.blacklistToolbar.toolbar,
@@ -64,7 +70,12 @@ class BlacklistAppsActivity : AppCompatActivity(), SearchView.OnQueryTextListene
     }
 
     override fun onPause() {
-        PreferenceHelper.editBlacklistPackages(mAdapter!!.selectedPackages)
+        val selected = mAdapter!!.selectedPackages
+        if (mIsMuteMode) {
+            PreferenceHelper.editMutedPackages(selected)
+        } else {
+            PreferenceHelper.editBlacklistPackages(selected)
+        }
         super.onPause()
     }
 
@@ -77,7 +88,12 @@ class BlacklistAppsActivity : AppCompatActivity(), SearchView.OnQueryTextListene
     }
 
     fun onDataLoaded(apps: ArrayList<App?>?) {
-        mAdapter!!.setApps(apps, PreferenceHelper.blacklistList)
+        val selectedList = if (mIsMuteMode) {
+            PreferenceHelper.mutedList
+        } else {
+            PreferenceHelper.blacklistList
+        }
+        mAdapter!!.setApps(apps, selectedList)
         updateViewStates(false)
     }
 
@@ -110,5 +126,9 @@ class BlacklistAppsActivity : AppCompatActivity(), SearchView.OnQueryTextListene
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        const val EXTRA_MUTE_MODE = "extra_mute_mode"
     }
 }

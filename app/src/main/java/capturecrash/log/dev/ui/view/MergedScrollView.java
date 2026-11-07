@@ -154,6 +154,11 @@ public class MergedScrollView extends FrameLayout {
 
     public MergedScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        if (!sCompatibilityDone && context != null) {
+            final int targetSdkVersion = context.getApplicationInfo().targetSdkVersion;
+            sUseZeroUnspecifiedMeasureSpec = targetSdkVersion < Build.VERSION_CODES.M;
+            sCompatibilityDone = true;
+        }
         initScrollView();
     }
 
@@ -523,7 +528,7 @@ public class MergedScrollView extends FrameLayout {
             return !(y < child.getTop() - scrollY
                     || y >= child.getBottom() - scrollY
                     || x < child.getLeft() - scrollX
-                    || x >= child.getRight() - scrollY);
+                    || x >= child.getRight() - scrollX);
         }
         return false;
     }

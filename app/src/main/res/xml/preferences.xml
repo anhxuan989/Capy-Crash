@@ -34,6 +34,13 @@
             android:title="@string/settings_show_stack_trace"
             app:iconSpaceReserved="false" />
 
+        <Preference
+            android:dependency="@string/prefKey_show_notification"
+            android:key="@string/prefKey_muted_apps"
+            android:summary="@string/settings_muted_apps_summary"
+            android:title="@string/settings_muted_apps"
+            app:iconSpaceReserved="false" />
+
     </PreferenceCategory>
 
 

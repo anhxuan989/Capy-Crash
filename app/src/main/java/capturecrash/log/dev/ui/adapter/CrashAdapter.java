@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.os.BundleCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import capturecrash.log.dev.core.data.crash.Crash;
 import capturecrash.log.dev.core.data.crash.CrashLoader;
 import capturecrash.log.dev.databinding.ItemCrashBinding;
 import capturecrash.log.dev.ui.view.RelativeTimeTextView;
+import capturecrash.log.dev.util.PreferenceHelper;
 import capturecrash.log.dev.util.Utils;
 
 public class CrashAdapter extends RecyclerView.Adapter<CrashAdapter.CrashViewHolder> {
@@ -143,17 +143,18 @@ public class CrashAdapter extends RecyclerView.Adapter<CrashAdapter.CrashViewHol
         mListener.onItemSelected(mSelectedCount);
     }
 
+    private static ArrayList<Crash> sCachedItems;
+    private static ArrayList<Crash> sCachedSearchedItems;
+
     public void saveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList("mItems", mItems);
-        outState.putParcelableArrayList("mSearchedItems", mSearchedItems);
+        sCachedItems = mItems;
+        sCachedSearchedItems = mSearchedItems;
         outState.putBoolean("mSearchActive", mSearchActive);
     }
 
     public void restoreInstanceState(Bundle outState) {
-        ArrayList<Crash> items = BundleCompat.getParcelableArrayList(outState, "mItems", Crash.class);
-        ArrayList<Crash> searched = BundleCompat.getParcelableArrayList(outState, "mSearchedItems", Crash.class);
-        mItems = items != null ? items : new ArrayList<>();
-        mSearchedItems = searched != null ? searched : new ArrayList<>();
+        mItems = sCachedItems != null ? sCachedItems : new ArrayList<>();
+        mSearchedItems = sCachedSearchedItems != null ? sCachedSearchedItems : new ArrayList<>();
         mSearchActive = outState.getBoolean("mSearchActive");
     }
 
@@ -174,6 +175,9 @@ public class CrashAdapter extends RecyclerView.Adapter<CrashAdapter.CrashViewHol
         holder.crash = crash;
         holder.icon.setImageDrawable(CrashLoader.getAppIcon(context, pkg));
         holder.time.setReferenceTime(crash.time);
+        holder.muteIcon.setVisibility(
+                PreferenceHelper.INSTANCE.isAppMuted(pkg) ? View.VISIBLE : View.GONE
+        );
         String name = CrashLoader.getAppName(context, pkg, false);
         if (!mCombineSameApps) {
             if (crash.count > 1) {
@@ -214,6 +218,7 @@ public class CrashAdapter extends RecyclerView.Adapter<CrashAdapter.CrashViewHol
 
         final ImageView icon;
         final TextView title;
+        final ImageView muteIcon;
         final RelativeTimeTextView time;
         final TextView crashText;
         final Drawable normalBackground;
@@ -225,6 +230,7 @@ public class CrashAdapter extends RecyclerView.Adapter<CrashAdapter.CrashViewHol
             this.binding = binding;
             icon = binding.crashItemAppIcon;
             title = binding.crashItemAppName;
+            muteIcon = binding.crashItemMuteIcon;
             time = binding.crashItemTime;
             crashText = binding.crashItemCrashLog;
             normalBackground = binding.getRoot().getBackground();

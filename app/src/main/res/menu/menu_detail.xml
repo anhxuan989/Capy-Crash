@@ -31,4 +31,16 @@
         app:iconTint="?android:textColorSecondary"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/menu_detail_mute_notif"
+        android:icon="@drawable/ic_notifications_off"
+        android:title="@string/action_mute_notif"
+        app:iconTint="?android:textColorSecondary"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_detail_blacklist"
+        android:title="@string/action_blacklist_app"
+        app:showAsAction="never" />
+
 </menu>

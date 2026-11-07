@@ -61,14 +61,73 @@ object PreferenceHelper {
         )
 
     val blacklistList: List<String>
-        get() = listOf(*blacklistedPackages?.split(",".toRegex())!!.toTypedArray())
+        get() = blacklistedPackages
+            ?.split(",".toRegex())
+            ?.filter { it.isNotEmpty() }
+            ?: emptyList()
 
-    fun editBlacklistPackages(packages: ArrayList<String>) {
+    fun editBlacklistPackages(packages: List<String>) {
         sharedPreferences.edit {
             putString(
                 getKey(R.string.key_blacklisted_packages),
-                packages.joinToString(",")
+                packages.filter { it.isNotEmpty() }.distinct().joinToString(",")
             )
         }
+    }
+
+    fun isAppBlacklisted(packageName: String?): Boolean {
+        if (packageName.isNullOrEmpty()) return false
+        return blacklistList.contains(packageName)
+    }
+
+    fun toggleBlacklistPackage(packageName: String): Boolean {
+        val current = blacklistList.toMutableList()
+        val nowBlacklisted = if (current.contains(packageName)) {
+            current.remove(packageName)
+            false
+        } else {
+            current.add(packageName)
+            true
+        }
+        editBlacklistPackages(current)
+        return nowBlacklisted
+    }
+
+    private val mutedPackages: String?
+        get() = sharedPreferences.getString(
+            getKey(R.string.key_muted_packages), ""
+        )
+
+    val mutedList: List<String>
+        get() = mutedPackages
+            ?.split(",".toRegex())
+            ?.filter { it.isNotEmpty() }
+            ?: emptyList()
+
+    fun editMutedPackages(packages: List<String>) {
+        sharedPreferences.edit {
+            putString(
+                getKey(R.string.key_muted_packages),
+                packages.filter { it.isNotEmpty() }.distinct().joinToString(",")
+            )
+        }
+    }
+
+    fun isAppMuted(packageName: String?): Boolean {
+        if (packageName.isNullOrEmpty()) return false
+        return mutedList.contains(packageName)
+    }
+
+    fun toggleMutePackage(packageName: String): Boolean {
+        val current = mutedList.toMutableList()
+        val nowMuted = if (current.contains(packageName)) {
+            current.remove(packageName)
+            false
+        } else {
+            current.add(packageName)
+            true
+        }
+        editMutedPackages(current)
+        return nowMuted
     }
 }

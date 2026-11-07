@@ -163,6 +163,7 @@ fun ComponentActivity.setupEdgeToEdge(
         size
     }
 
+    val initialScrollPaddingTop = scrollingView?.paddingTop ?: 0
     val initialScrollPaddingBottom = scrollingView?.paddingBottom ?: 0
     val initialScrollPaddingLeft = scrollingView?.paddingLeft ?: 0
     val initialScrollPaddingRight = scrollingView?.paddingRight ?: 0
@@ -190,10 +191,16 @@ fun ComponentActivity.setupEdgeToEdge(
             height = actionBarSize + insets.top
         }
 
-        contentView?.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-            topMargin = actionBarSize + insets.top
-            leftMargin = insets.left
-            rightMargin = insets.right
+        contentView?.let { cv ->
+            val lp = cv.layoutParams
+            if (lp is ViewGroup.MarginLayoutParams) {
+                if ((cv.parent as? android.widget.LinearLayout)?.orientation != android.widget.LinearLayout.VERTICAL) {
+                    lp.topMargin = actionBarSize + insets.top
+                }
+                lp.leftMargin = insets.left
+                lp.rightMargin = insets.right
+                cv.layoutParams = lp
+            }
         }
 
         if (scrollingView != null) {
@@ -201,6 +208,7 @@ fun ComponentActivity.setupEdgeToEdge(
                 scrollingView.clipToPadding = false
             }
             scrollingView.updatePadding(
+                top = initialScrollPaddingTop,
                 left = initialScrollPaddingLeft + (if (contentView == null) insets.left else 0),
                 right = initialScrollPaddingRight + (if (contentView == null) insets.right else 0),
                 bottom = initialScrollPaddingBottom + insets.bottom

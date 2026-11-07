@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_cab_mute_notif"
+        android:icon="@drawable/ic_notifications_off"
+        android:title="@string/action_mute_notif"
+        app:iconTint="?android:textColorSecondary"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/menu_cab_delete"
         android:icon="@drawable/ic_delete"
         android:title="@string/action_delete"
