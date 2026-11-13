@@ -193,12 +193,23 @@ abstract class CrashDetector : ICrashDetector.Stub() {
         lastReportedTime = now
         lastReportedKey = key
 
+        val safeDesc = if (description.length > 2048) {
+            description.substring(0, 2048) + "\n\n... [Truncated]"
+        } else {
+            description
+        }
+        val safeTrace = if (stackTrace.length > 131072) {
+            stackTrace.substring(0, 131072) + "\n\n... [Truncated]"
+        } else {
+            stackTrace
+        }
+
         val intent = Intent(Intents.INTENT_ACTION)
             .setClassName(BuildConfig.APPLICATION_ID, CrashReceiver::class.java.name)
             .putExtra(Intents.INTENT_PACKAGE_NAME, packageName)
             .putExtra(Intents.INTENT_TIME, now)
-            .putExtra(Intents.INTENT_DESCRIPTION, description)
-            .putExtra(Intents.INTENT_STACKTRACE, stackTrace)
+            .putExtra(Intents.INTENT_DESCRIPTION, safeDesc)
+            .putExtra(Intents.INTENT_STACKTRACE, safeTrace)
         sendBroadcast(intent)
     }
 

@@ -7,11 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import capturecrash.log.dev.BuildConfig
 import capturecrash.log.dev.R
 import capturecrash.log.dev.ScoopApplication.Companion.bootTime
 import capturecrash.log.dev.core.data.crash.Crash
@@ -31,40 +33,58 @@ import capturecrash.log.dev.util.PreferenceHelper.showStackTraceNotifications
 import capturecrash.log.dev.util.convertToBitmap
 import capturecrash.log.dev.util.getCompatColor
 import capturecrash.log.dev.util.setPendingIntentFlag
+import java.util.concurrent.Executors
 
 class CrashReceiver : BroadcastReceiver() {
-
-    private var packageName: String? = null
-    private var description: String? = null
-    private var stackTrace: String? = null
 
     override fun onReceive(context: Context, intent: Intent?) {
         if (intent?.action != Intents.INTENT_ACTION)
             return
 
-        description = intent.getStringExtra(Intents.INTENT_DESCRIPTION) ?: return
-        if (description!!.startsWith(ThreadDeath::class.java.name) && ignoreThreadDeath)
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
+        receiverExecutor.execute {
+            try {
+                handleCrashIntent(appContext, intent)
+            } catch (t: Throwable) {
+                Log.e("CapyCrash", "Error handling crash broadcast", t)
+            } finally {
+                try {
+                    pendingResult.finish()
+                } catch (_: Throwable) {
+                }
+            }
+        }
+    }
+
+    private fun handleCrashIntent(context: Context, intent: Intent) {
+        val rawDesc = intent.getStringExtra(Intents.INTENT_DESCRIPTION) ?: return
+        if (rawDesc.startsWith(ThreadDeath::class.java.name) && ignoreThreadDeath)
             return
 
-        packageName = intent.getStringExtra(Intents.INTENT_PACKAGE_NAME)
-        val time = intent.getLongExtra(Intents.INTENT_TIME, System.currentTimeMillis())
-        stackTrace = intent.getStringExtra(Intents.INTENT_STACKTRACE)
+        val pkgName = intent.getStringExtra(Intents.INTENT_PACKAGE_NAME)
+        if (pkgName.isNullOrEmpty() || pkgName == BuildConfig.APPLICATION_ID) {
+            return
+        }
 
-        if (blacklistList.contains(packageName)) {
+        val time = intent.getLongExtra(Intents.INTENT_TIME, System.currentTimeMillis())
+        val rawStackTrace = intent.getStringExtra(Intents.INTENT_STACKTRACE)
+
+        if (blacklistList.contains(pkgName)) {
             return
         }
 
         val crash: Crash?
         val update = intent.getBooleanExtra(Intents.INTENT_UPDATE, false)
         if (!update) {
-            crash = Crash(time, packageName, description, stackTrace)
+            crash = Crash(time, pkgName, rawDesc, rawStackTrace)
             updateCrashDatabase(context, crash)
             MainActivity.requestUpdate(crash)
         } else {
             crash = IntentCompat.getParcelableExtra(intent, "crash", Crash::class.java)
         }
 
-        if (!showNotifications || mutedList.contains(packageName)) {
+        if (!showNotifications || mutedList.contains(pkgName)) {
             return
         }
 
@@ -77,23 +97,33 @@ class CrashReceiver : BroadcastReceiver() {
             return
         }
 
+        val crashId = crash?.id ?: -1L
         val clickIntent = Intent(context, DetailActivity::class.java).apply {
-            if (crash != null && crash.id > 0L) {
-                putExtra(DetailActivity.EXTRA_CRASH_ID, crash.id)
-            } else {
-                putExtra(DetailActivity.EXTRA_CRASH, crash)
+            if (crashId > 0L) {
+                putExtra(DetailActivity.EXTRA_CRASH_ID, crashId)
+            } else if (crash != null) {
+                // Avoid putting huge stack traces inside PendingIntent sent to SystemUI
+                val lightCrash = Crash(
+                    crash.time,
+                    crash.packageName,
+                    crash.description,
+                    truncateForBinder(crash.stackTrace, 16384)
+                )
+                putExtra(DetailActivity.EXTRA_CRASH, lightCrash)
             }
         }
         val stackBuilder = TaskStackBuilder.create(context)
             .addParentStack(DetailActivity::class.java)
             .addNextIntent(clickIntent)
-        val clickPendingIntent = stackBuilder.getPendingIntent(0, setPendingIntentFlag())
+        val notificationId = (time - bootTime).toInt()
+        val clickPendingIntent = stackBuilder.getPendingIntent(notificationId, setPendingIntentFlag())
 
+        val safeDesc = truncateForBinder(rawDesc, 512) ?: ""
         val builder = NotificationCompat.Builder(context, "crashes").apply {
             setSmallIcon(R.drawable.ic_bug_report)
-            setLargeIcon(CrashLoader.getAppIcon(context, packageName).convertToBitmap())
-            setContentTitle(CrashLoader.getAppName(context, packageName, false))
-            setContentText(description)
+            setLargeIcon(CrashLoader.getAppIcon(context, pkgName).convertToBitmap())
+            setContentTitle(CrashLoader.getAppName(context, pkgName, false))
+            setContentText(safeDesc)
             setPriority(NotificationCompat.PRIORITY_MAX)
             setDefaults(NotificationCompat.DEFAULT_VIBRATE)
             setColor(context.getCompatColor(R.color.colorAccent))
@@ -102,12 +132,11 @@ class CrashReceiver : BroadcastReceiver() {
             setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             setGroup("crashes")
             setContentIntent(clickPendingIntent)
-            setNotificationStyle()
+            setNotificationStyle(safeDesc, rawStackTrace)
         }
 
-        val notificationId = (time - bootTime).toInt()
         if (showActionButtons) {
-            builder.addActionButtons(context, notificationId, crash?.id ?: -1L)
+            builder.addActionButtons(context, notificationId, crashId, pkgName, rawStackTrace)
         }
 
         val manager = NotificationManagerCompat.from(context)
@@ -120,15 +149,15 @@ class CrashReceiver : BroadcastReceiver() {
         destroyDatabaseInstance("receiver")
     }
 
-    private fun NotificationCompat.Builder.setNotificationStyle(): NotificationCompat.Builder {
+    private fun NotificationCompat.Builder.setNotificationStyle(
+        description: String,
+        stackTrace: String?
+    ): NotificationCompat.Builder {
         return if (showStackTraceNotifications && stackTrace != null) {
             val style = NotificationCompat.InboxStyle()
-            val traces = stackTrace!!.split("\n".toRegex()).toTypedArray()
-            var i = 0
-            while (i < 6 && i < traces.size) {
-                // Inbox style only shows 6 entries
-                style.addLine(traces[i])
-                i++
+            val traces = stackTrace.lineSequence().take(6).toList()
+            for (line in traces) {
+                style.addLine(truncateForBinder(line, 256))
             }
             setStyle(style)
         } else {
@@ -137,11 +166,15 @@ class CrashReceiver : BroadcastReceiver() {
     }
 
     private fun NotificationCompat.Builder.addActionButtons(
-        context: Context, notificationId: Int, crashId: Long
+        context: Context,
+        notificationId: Int,
+        crashId: Long,
+        pkgName: String,
+        stackTrace: String?
     ): NotificationCompat.Builder {
         val copyIntent = Intent(context, NotificationActionReceiver::class.java)
             .putExtra("crash_id", crashId)
-            .putExtra("pkg", packageName)
+            .putExtra("pkg", pkgName)
             .setAction(Intents.INTENT_ACTION_COPY)
         val copyPendingIntent = PendingIntent.getBroadcast(
             context, notificationId, copyIntent, setPendingIntentFlag()
@@ -154,20 +187,18 @@ class CrashReceiver : BroadcastReceiver() {
             )
         )
 
-        val safeTrace = if ((stackTrace?.length ?: 0) > 65536) {
-            stackTrace!!.substring(0, 65536) + "\n\n... [Truncated]"
-        } else {
-            stackTrace
-        }
+        val safeTrace = truncateForBinder(stackTrace, 32768)
         val shareIntent = Intent(Intent.ACTION_SEND)
-            .putExtra("pkg", packageName)
+            .putExtra("pkg", pkgName)
             .setType("text/plain")
             .putExtra(Intent.EXTRA_TEXT, safeTrace)
         val shareChooserIntent = Intent.createChooser(shareIntent, null)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         val sharePendingIntent = PendingIntent.getActivity(
             context,
-            notificationId, shareChooserIntent, setPendingIntentFlag()
+            notificationId + 1,
+            shareChooserIntent,
+            setPendingIntentFlag()
         )
         addAction(
             NotificationCompat.Action(
@@ -177,5 +208,20 @@ class CrashReceiver : BroadcastReceiver() {
             )
         )
         return this
+    }
+
+    private fun truncateForBinder(text: String?, maxLen: Int): String? {
+        if (text == null) return null
+        return if (text.length > maxLen) {
+            text.substring(0, maxLen) + "\n\n... [Truncated]"
+        } else {
+            text
+        }
+    }
+
+    companion object {
+        private val receiverExecutor = Executors.newSingleThreadExecutor { r ->
+            Thread(r, "CapyCrash-ReceiverWorker").apply { isDaemon = true }
+        }
     }
 }

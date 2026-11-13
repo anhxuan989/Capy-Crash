@@ -25,6 +25,22 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 context.copyTextToClipboard(R.string.copy_label, pkg, stackTrace)
                 context.displayToast(R.string.copied_toast)
             }
+            Intents.INTENT_ACTION_SHARE -> {
+                if (!stackTrace.isNullOrEmpty()) {
+                    val safeTrace = if (stackTrace.length > 131072) {
+                        stackTrace.substring(0, 131072) + "\n\n... [Truncated]"
+                    } else {
+                        stackTrace
+                    }
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                        .putExtra("pkg", pkg)
+                        .setType("text/plain")
+                        .putExtra(Intent.EXTRA_TEXT, safeTrace)
+                    val chooser = Intent.createChooser(shareIntent, context.getString(R.string.action_share))
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(chooser)
+                }
+            }
         }
     }
 }

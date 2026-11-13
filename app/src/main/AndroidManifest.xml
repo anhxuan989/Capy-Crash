@@ -104,6 +104,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="capturecrash.log.dev.ACTION_COPY" />
+                <action android:name="capturecrash.log.dev.ACTION_SHARE" />
             </intent-filter>
         </receiver>
 
